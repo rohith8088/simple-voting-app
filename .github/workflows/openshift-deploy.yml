@@ -19,4 +19,4 @@ jobs:
           oc login ${{ secrets.OCP_SERVER }} --token=${{ secrets.OCP_TOKEN }} --insecure-skip-tls-verify=true
       - name: Trigger Build
         run: |
-          oc start-build demo-git -n my-111 --wait
+          oc start-build simple-voting-app-git -n my-111 --wait
