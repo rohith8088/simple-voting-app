@@ -1,35 +1,23 @@
-name: OpenShift Deployment
+name: Trigger OpenShift Build
 
 on:
   push:
     branches:
-      - main  # Adjust if your default branch is different
+      - main
 
 env:
-  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/simple-voting-app
-  IMAGE_TAG: ${{ github.sha }}
   OPENSHIFT_SERVER: ${{ secrets.OPENSHIFT_SERVER }}
   OPENSHIFT_TOKEN: ${{ secrets.OPENSHIFT_TOKEN }}
   OPENSHIFT_NAMESPACE: ${{ secrets.OPENSHIFT_NAMESPACE }}
+  BUILD_NAME: simple-voting-app-git
 
 jobs:
-  build-and-deploy:
+  trigger-build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout Repository
         uses: actions/checkout@v3
-
-      - name: Log in to GitHub Container Registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
-      - name: Build Docker image
-        run: |
-          docker build -t $IMAGE_NAME:$IMAGE_TAG .
-
-      - name: Push Docker image
-        run: |
-          docker push $IMAGE_NAME:$IMAGE_TAG
 
       - name: Install OpenShift CLI
         uses: redhat-actions/oc-installer@v1
@@ -40,8 +28,10 @@ jobs:
           openshift_server_url: ${{ env.OPENSHIFT_SERVER }}
           openshift_token: ${{ env.OPENSHIFT_TOKEN }}
 
-      - name: Deploy to OpenShift
+      - name: Set OpenShift Project
         run: |
           oc project ${{ env.OPENSHIFT_NAMESPACE }}
-          oc new-app --name=simple-voting-app $IMAGE_NAME:$IMAGE_TAG --as-deployment-config
-          oc expose svc/simple-voting-app
+
+      - name: Start Build
+        run: |
+          oc start-build $BUILD_NAME --wait --follow
