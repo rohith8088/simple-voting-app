@@ -32,6 +32,11 @@ jobs:
         run: |
           oc project ${{ env.OPENSHIFT_NAMESPACE }}
 
+      - name: Debug OpenShift Info
+        run: |
+          oc whoami
+          oc status
+
       - name: Start Build
         run: |
           oc start-build $BUILD_NAME --wait --follow
