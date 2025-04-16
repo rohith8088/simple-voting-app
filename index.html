@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Voting App</title>
+</head>
+<body>
+  <h1>Welcome to the Voting System!</h1>
+  <button id="option1">Option 1</button>
+  <button id="option2">Option 2</button>
+  <p id="result">Votes: 0 - 0</p>
+  
+  <script>
+    let option1Votes = 0;
+    let option2Votes = 0;
+    
+    document.getElementById('option1').addEventListener('click', () => {
+      option1Votes++;
+      updateVotes();
+    });
+
+    document.getElementById('option2').addEventListener('click', () => {
+      option2Votes++;
+      updateVotes();
+    });
+
+    function updateVotes() {
+      document.getElementById('result').textContent = `Votes: ${option1Votes} - ${option2Votes}`;
+    }
+  </script>
+</body>
+</html>
