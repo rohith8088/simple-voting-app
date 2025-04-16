@@ -1,22 +1,22 @@
-name: Deploy to OpenShift
+name: Trigger OpenShift Build
 on:
   push:
     branches:
       - main
 jobs:
-  deploy:
+  start-build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout repo
         uses: actions/checkout@v3
-      - name: Install OpenShift CLI
-        uses: redhat-actions/oc-installer@v1
-      - name: Login to OpenShift
-        uses: redhat-actions/oc-login@v1
-        with:
-          openshift_server_url: ${{ secrets.OPENSHIFT_SERVER_URL }}
-          openshift_token: ${{ secrets.OPENSHIFT_TOKEN }}
-      - name: Deploy application
+      - name: Install OpenShift CLI (oc)
         run: |
-          oc new-app https://github.com/Raju8115/Openshift-project.git
-          oc expose svc/openshift-project
+          curl -LO "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux.tar.gz"
+          tar -xvf openshift-client-linux.tar.gz
+          sudo mv oc /usr/local/bin/
+      - name: Login to OpenShift
+        run: |
+          oc login ${{ secrets.OCP_SERVER }} --token=${{ secrets.OCP_TOKEN }} --insecure-skip-tls-verify=true
+      - name: Trigger Build
+        run: |
+          oc start-build demo-git -n my-111 --wait
