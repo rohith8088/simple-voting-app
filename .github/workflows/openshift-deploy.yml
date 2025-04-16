@@ -1,22 +1,47 @@
-name: Trigger OpenShift Build
+name: OpenShift Deployment
+
 on:
   push:
     branches:
-      - main
+      - main  # Adjust if your default branch is different
+
+env:
+  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/simple-voting-app
+  IMAGE_TAG: ${{ github.sha }}
+  OPENSHIFT_SERVER: ${{ secrets.OPENSHIFT_SERVER }}
+  OPENSHIFT_TOKEN: ${{ secrets.OPENSHIFT_TOKEN }}
+  OPENSHIFT_NAMESPACE: ${{ secrets.OPENSHIFT_NAMESPACE }}
+
 jobs:
-  start-build:
+  build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repo
+      - name: Checkout code
         uses: actions/checkout@v3
-      - name: Install OpenShift CLI (oc)
+
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build Docker image
         run: |
-          curl -LO "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux.tar.gz"
-          tar -xvf openshift-client-linux.tar.gz
-          sudo mv oc /usr/local/bin/
-      - name: Login to OpenShift
+          docker build -t $IMAGE_NAME:$IMAGE_TAG .
+
+      - name: Push Docker image
         run: |
-          oc login ${{ secrets.OCP_SERVER }} --token=${{ secrets.OCP_TOKEN }} --insecure-skip-tls-verify=true
-      - name: Trigger Build
+          docker push $IMAGE_NAME:$IMAGE_TAG
+
+      - name: Install OpenShift CLI
+        uses: redhat-actions/oc-installer@v1
+
+      - name: Log in to OpenShift
+        uses: redhat-actions/oc-login@v1
+        with:
+          openshift_server_url: ${{ env.OPENSHIFT_SERVER }}
+          openshift_token: ${{ env.OPENSHIFT_TOKEN }}
+
+      - name: Deploy to OpenShift
         run: |
-          oc start-build simple-voting-app-git -n my-111 --wait
+          oc project ${{ env.OPENSHIFT_NAMESPACE }}
+          oc new-app --name=simple-voting-app $IMAGE_NAME:$IMAGE_TAG --as-deployment-config
+          oc expose svc/simple-voting-app
