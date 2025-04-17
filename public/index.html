@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Voting App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px 0;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+
+        .container {
+            margin: 50px auto;
+            padding: 30px;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            width: 80%;
+            max-width: 600px;
+        }
+
+        .button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 25px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .button:hover {
+            background-color: #45a049;
+        }
+
+        .results {
+            margin-top: 20px;
+            font-size: 1.5rem;
+        }
+
+        footer {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>Welcome to the Voting System!</h1>
+    </header>
+
+    <div class="container">
+        <h2>Vote for your favorite and Best party...</h2>
+
+        <button id="party1" class="button">Party A</button>
+        <button id="party2" class="button">Party B</button>
+        <button id="party3" class="button">Party C</button>
+        <button id="party4" class="button">Party D</button>
+
+        <div class="results">
+            <p id="result">Votes: 0 - 0 - 0 - 0</p>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Voting App</p>
+    </footer>
+
+    <script>
+        // Function to fetch the updated vote counts from the backend
+        function updateVotes() {
+            fetch('http://localhost:3000/votes')
+                .then(response => response.json())
+                .then(data => {
+                    // Update the displayed vote count
+                    document.getElementById('result').textContent = `Votes: ${data.party1} - ${data.party2} - ${data.party3} - ${data.party4}`;
+                })
+                .catch(error => console.error('Error fetching vote data:', error));
+        }
+
+        // Event listeners for voting buttons
+        document.getElementById('party1').addEventListener('click', () => {
+            // Send vote to the backend
+            fetch('http://localhost:3000/vote/party1', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message === 'Vote counted') {
+                        updateVotes(); // Re-fetch vote counts after voting
+                    }
+                })
+                .catch(error => console.error('Error voting:', error));
+        });
+
+        document.getElementById('party2').addEventListener('click', () => {
+            fetch('http://localhost:3000/vote/party2', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message === 'Vote counted') {
+                        updateVotes();
+                    }
+                })
+                .catch(error => console.error('Error voting:', error));
+        });
+
+        document.getElementById('party3').addEventListener('click', () => {
+            fetch('http://localhost:3000/vote/party3', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message === 'Vote counted') {
+                        updateVotes();
+                    }
+                })
+                .catch(error => console.error('Error voting:', error));
+        });
+
+        document.getElementById('party4').addEventListener('click', () => {
+            fetch('http://localhost:3000/vote/party4', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message === 'Vote counted') {
+                        updateVotes();
+                    }
+                })
+                .catch(error => console.error('Error voting:', error));
+        });
+
+        // Initialize votes when the page loads
+        window.onload = updateVotes;
+    </script>
+
+</body>
+
+</html>
