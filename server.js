@@ -12,9 +12,15 @@ let votes = {
 // Middleware to serve static files (HTML, CSS, JS)
 app.use(express.static('public'));
 
-// Route to get the current vote counts
+// Route to get the current vote counts in JSON
 app.get('/votes', (req, res) => {
     res.json(votes);
+});
+
+// Route to get a vote summary string
+app.get('/votes/summary', (req, res) => {
+    const summary = `Votes: ${votes.party1} - ${votes.party2} - ${votes.party3} - ${votes.party4}`;
+    res.send(summary);
 });
 
 // Route to vote for a specific party
