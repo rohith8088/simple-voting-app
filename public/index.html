@@ -37,8 +37,8 @@
             fetch('/vote/party1', { method: 'POST' })
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data);
-                    updateVotes();
+                    console.log('Vote for Party 1 counted:', data);
+                    updateVotes(); // Update vote count
                 })
                 .catch(error => console.error('Error:', error));
         });
@@ -47,8 +47,8 @@
             fetch('/vote/party2', { method: 'POST' })
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data);
-                    updateVotes();
+                    console.log('Vote for Party 2 counted:', data);
+                    updateVotes(); // Update vote count
                 })
                 .catch(error => console.error('Error:', error));
         });
@@ -57,8 +57,8 @@
             fetch('/vote/party3', { method: 'POST' })
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data);
-                    updateVotes();
+                    console.log('Vote for Party 3 counted:', data);
+                    updateVotes(); // Update vote count
                 })
                 .catch(error => console.error('Error:', error));
         });
@@ -67,8 +67,8 @@
             fetch('/vote/party4', { method: 'POST' })
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data);
-                    updateVotes();
+                    console.log('Vote for Party 4 counted:', data);
+                    updateVotes(); // Update vote count
                 })
                 .catch(error => console.error('Error:', error));
         });
@@ -85,7 +85,7 @@
         }
 
         // Initialize votes when the page loads
-        updateVotes();
+        updateVotes(); // Get the current vote counts when the page loads
     </script>
 </body>
 </html>
