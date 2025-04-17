@@ -3,12 +3,14 @@ const fs = require('fs');
 const path = require('path');
 const bodyParser = require('body-parser');
 const app = express();
-const PORT = 3000;
+
+// ✅ Use OpenShift/Knative-compatible dynamic port
+const PORT = process.env.PORT || 8080;
 
 const feedbackFile = path.join(__dirname, 'feedback.json');
 
 app.use(bodyParser.json());
-app.use(express.static('public')); // to serve frontend
+app.use(express.static('public')); // Serve frontend
 
 // Load existing feedback or initialize
 const getFeedback = () => {
@@ -38,5 +40,5 @@ app.post('/api/feedback', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+  console.log(`✅ Server running at http://localhost:${PORT}`);
 });
