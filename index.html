@@ -91,43 +91,65 @@
     </footer>
 
     <script>
-        let party1Votes = localStorage.getItem('party1Votes') ? parseInt(localStorage.getItem('party1Votes')) : 0;
-        let party2Votes = localStorage.getItem('party2Votes') ? parseInt(localStorage.getItem('party2Votes')) : 0;
-        let party3Votes = localStorage.getItem('party3Votes') ? parseInt(localStorage.getItem('party3Votes')) : 0;
-        let party4Votes = localStorage.getItem('party4Votes') ? parseInt(localStorage.getItem('party4Votes')) : 0;
+        // Function to fetch the updated vote counts from the backend
+        function updateVotes() {
+            fetch('http://localhost:3000/votes')
+                .then(response => response.json())
+                .then(data => {
+                    // Update the displayed vote count
+                    document.getElementById('result').textContent = `Votes: ${data.party1} - ${data.party2} - ${data.party3} - ${data.party4}`;
+                })
+                .catch(error => console.error('Error fetching vote data:', error));
+        }
 
         // Event listeners for voting buttons
         document.getElementById('party1').addEventListener('click', () => {
-            party1Votes++;
-            localStorage.setItem('party1Votes', party1Votes);
-            updateVotes();
+            // Send vote to the backend
+            fetch('http://localhost:3000/vote/party1', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message === 'Vote counted') {
+                        updateVotes(); // Re-fetch vote counts after voting
+                    }
+                })
+                .catch(error => console.error('Error voting:', error));
         });
 
         document.getElementById('party2').addEventListener('click', () => {
-            party2Votes++;
-            localStorage.setItem('party2Votes', party2Votes);
-            updateVotes();
+            fetch('http://localhost:3000/vote/party2', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message === 'Vote counted') {
+                        updateVotes();
+                    }
+                })
+                .catch(error => console.error('Error voting:', error));
         });
 
         document.getElementById('party3').addEventListener('click', () => {
-            party3Votes++;
-            localStorage.setItem('party3Votes', party3Votes);
-            updateVotes();
+            fetch('http://localhost:3000/vote/party3', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message === 'Vote counted') {
+                        updateVotes();
+                    }
+                })
+                .catch(error => console.error('Error voting:', error));
         });
 
         document.getElementById('party4').addEventListener('click', () => {
-            party4Votes++;
-            localStorage.setItem('party4Votes', party4Votes);
-            updateVotes();
+            fetch('http://localhost:3000/vote/party4', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message === 'Vote counted') {
+                        updateVotes();
+                    }
+                })
+                .catch(error => console.error('Error voting:', error));
         });
 
-        // Update the displayed vote count
-        function updateVotes() {
-            document.getElementById('result').textContent = `Votes: ${party1Votes} - ${party2Votes} - ${party3Votes} - ${party4Votes}`;
-        }
-
         // Initialize votes when the page loads
-        updateVotes();
+        window.onload = updateVotes;
     </script>
 
 </body>
