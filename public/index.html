@@ -1,91 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Voting App</title>
-    <style>
-        /* Your styles go here */
-    </style>
+  <meta charset="UTF-8">
+  <title>Feedback App</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    .feedback { margin-top: 20px; border-top: 1px solid #ccc; padding-top: 10px; }
+    .entry { margin-bottom: 10px; }
+  </style>
 </head>
 <body>
 
-    <header>
-        <h1>Welcome to the Voting System!</h1>
-    </header>
+  <h1>Leave Your Feedback</h1>
+  <form id="feedbackForm">
+    <input type="text" id="name" placeholder="Your Name" required><br><br>
+    <textarea id="message" placeholder="Your Feedback" required></textarea><br><br>
+    <button type="submit">Submit</button>
+  </form>
 
-    <div class="container">
-        <h2>Vote for your favorite party...</h2>
+  <div class="feedback" id="feedbackList">
+    <h2>All Feedback</h2>
+  </div>
 
-        <button id="party1" class="button">Party A</button>
-        <button id="party2" class="button">Party B</button>
-        <button id="party3" class="button">Party C</button>
-        <button id="party4" class="button">Party D</button>
+  <script>
+    const form = document.getElementById('feedbackForm');
+    const feedbackList = document.getElementById('feedbackList');
 
-        <div class="results">
-            <p id="result">Votes: 0 - 0 - 0 - 0</p>
-        </div>
-    </div>
+    // Load existing feedback on page load
+    fetch('/api/feedback')
+      .then(res => res.json())
+      .then(data => {
+        data.forEach(entry => addEntry(entry));
+      });
 
-    <footer>
-        <p>&copy; 2025 Voting App</p>
-    </footer>
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const name = document.getElementById('name').value;
+      const message = document.getElementById('message').value;
 
-    <script>
-        // Add event listeners to each button to make POST requests when clicked
-        document.getElementById('party1').addEventListener('click', function() {
-            fetch('/vote/party1', { method: 'POST' })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Vote for Party 1 counted:', data);
-                    updateVotes(); // Update vote count
-                })
-                .catch(error => console.error('Error:', error));
-        });
+      const res = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, message })
+      });
 
-        document.getElementById('party2').addEventListener('click', function() {
-            fetch('/vote/party2', { method: 'POST' })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Vote for Party 2 counted:', data);
-                    updateVotes(); // Update vote count
-                })
-                .catch(error => console.error('Error:', error));
-        });
+      if (res.ok) {
+        addEntry({ name, message });
+        form.reset();
+      }
+    });
 
-        document.getElementById('party3').addEventListener('click', function() {
-            fetch('/vote/party3', { method: 'POST' })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Vote for Party 3 counted:', data);
-                    updateVotes(); // Update vote count
-                })
-                .catch(error => console.error('Error:', error));
-        });
+    function addEntry({ name, message }) {
+      const entry = document.createElement('div');
+      entry.className = 'entry';
+      entry.innerHTML = `<strong>${name}</strong>: ${message}`;
+      feedbackList.appendChild(entry);
+    }
+  </script>
 
-        document.getElementById('party4').addEventListener('click', function() {
-            fetch('/vote/party4', { method: 'POST' })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Vote for Party 4 counted:', data);
-                    updateVotes(); // Update vote count
-                })
-                .catch(error => console.error('Error:', error));
-        });
-
-        // Function to update the votes shown on the page
-        function updateVotes() {
-            fetch('/votes')
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('result').textContent = 
-                        `Votes: ${data.party1} - ${data.party2} - ${data.party3} - ${data.party4}`;
-                })
-                .catch(error => console.error('Error:', error));
-        }
-
-        // Initialize votes when the page loads
-        updateVotes(); // Get the current vote counts when the page loads
-    </script>
 </body>
 </html>
