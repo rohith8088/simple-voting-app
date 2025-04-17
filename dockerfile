@@ -1,8 +1,20 @@
-# Use an official Nginx image as a base
-FROM nginx:alpine
+# Use Node.js base image
+FROM node:18
 
-# Copy the index.html to the default Nginx HTML directory
-COPY index.html /usr/share/nginx/html/index.html
+# Set working directory
+WORKDIR /app
 
-# Expose port 80 for the web server
-EXPOSE 80
+# Copy app files
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+# The server.js serves index.html from /public by default, so make sure it’s in the right place
+RUN mkdir -p public && mv index.html public/
+
+# Expose port your server listens on
+EXPOSE 3000
+
+# Start your app
+CMD ["npm", "start"]
