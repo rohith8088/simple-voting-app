@@ -1,5 +1,5 @@
-const path = require('path');
 const express = require('express');
+const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -13,15 +13,12 @@ let votes = {
 // Serve static files from the "public" directory
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Middleware to parse JSON bodies
+app.use(express.json());
+
 // API: Get current vote counts
 app.get('/votes', (req, res) => {
     res.json(votes);
-});
-
-// API: Get a vote summary string
-app.get('/votes/summary', (req, res) => {
-    const summary = `Votes: ${votes.party1} - ${votes.party2} - ${votes.party3} - ${votes.party4}`;
-    res.send(summary);
 });
 
 // API: Vote for a specific party
@@ -35,12 +32,12 @@ app.post('/vote/:party', (req, res) => {
     }
 });
 
-// Fallback route: send index.html for any unmatched GET request
+// Fallback route for all other GET requests, serve the index.html
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Start the server
 app.listen(PORT, () => {
-    console.log(`✅ Server running at http://localhost:${PORT}`);
+    console.log(`Server running on http://localhost:${PORT}`);
 });
